@@ -31,9 +31,10 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import "@xyflow/react/dist/style.css";
 import { useCallback, useState, useRef, useEffect, useMemo } from "react";
-import { EdgeAnimationCircle } from "./components/EdgeAnimationCircle";
-import { EdgeAnimationArrow } from "./components/EdgeAnimationArrow";
+import { EdgeAnimationCircle } from "./components/edges/EdgeAnimationCircle";
+import { EdgeAnimationArrow } from "./components/edges/EdgeAnimationArrow";
 import CustomNode1 from "./components/nodes/CustomNode1";
+import StartPoint from "./components/nodes/StartPoint";
 
 const initialNodes: Node[] = [
   //   { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
@@ -52,11 +53,16 @@ const edgeTypes = {
   ),
 };
 
-const nodeTypes: NodeTypes = {
-  cardNode: CustomNode1,
-};
+
 
 function Flow() {
+
+  const nodeTypes: NodeTypes = {
+    cardNode: CustomNode1,
+    startPoint: StartPoint
+  };
+
+  
   const reactFlowInstance = useReactFlow();
   const flowWrapperRef = useRef<HTMLDivElement>(null);
 
@@ -65,6 +71,12 @@ function Flow() {
 
   const [name, setName] = useState("");
   const [color, setColor] = useState("");
+
+  useEffect(()=>{
+if(nodes.length==0){
+  setNodes([{ id: "1", position: { x: 0, y: 0 }, type:"startPoint", data: { label: "Start" } }])
+}
+  },[nodes])
 
   const handleNewNodes = () => {
     if (!flowWrapperRef.current) return;
@@ -112,7 +124,13 @@ function Flow() {
 
   return (
     <>
-      <Modal opened={opened} onClose={close} title="Authentication" centered radius={'lg'}>
+      <Modal
+        opened={opened}
+        onClose={close}
+        title="Authentication"
+        centered
+        radius={"lg"}
+      >
         <Stack>
           <TextInput
             label={"Task Name"}
@@ -126,8 +144,9 @@ function Flow() {
             label="Color"
             description="Color task"
             placeholder="Change color"
-            value={color} onChange={(e)=>{
-              setColor(e)
+            value={color}
+            onChange={(e) => {
+              setColor(e);
             }}
           />
           <Button onClick={handleNewNodes}>Add Task</Button>
